@@ -25,7 +25,6 @@ public class PhotoFragment extends BaseFragment {
     @Bind(R.id.pv_photo)
     PhotoView pvPhoto;
 
-    String mDemoUrl="http://pkimg.image.alimmdn.com/upload/20160317/3642c693bd04d200d050a34de9392967.JPG";
 
     private String url=null;
     public static PhotoFragment newInstance(String photoData) {
@@ -49,9 +48,8 @@ public class PhotoFragment extends BaseFragment {
             url=getArguments().getString("photo");
             PicassoIML.loadImage(pvPhoto,url,getContext());
         }
-
-
     }
+
 
     @Override
     protected void initData() {

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WatchPhotoDemo</string>
+    <string name="title_num">%1$s/%2$s</string>
 </resources>
