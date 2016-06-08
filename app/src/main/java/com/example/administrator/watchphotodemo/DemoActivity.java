@@ -22,6 +22,7 @@ public class DemoActivity extends AppCompatActivity {
     @Bind(R.id.vp_photo_pager)
     ViewPager vpPhotoPager;
     private int mCurrentTab = 1;
+
     private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
     ArrayList<String> mdatas = new ArrayList<>();
     private PagerAdapter mAdapter;
@@ -46,6 +47,7 @@ public class DemoActivity extends AppCompatActivity {
         initView();
     }
 
+
     private void initView() {
         mdatas.add("http://pkicdn.image.alimmdn.com/old/newuploads/8bdaaa6d4e1fbc5e03385ef454f9577e.jpg");
         mdatas.add("http://pkicdn.image.alimmdn.com/old/newuploads/0b79e02a47d57002de8200b31f2657cc.jpg");
@@ -57,6 +59,8 @@ public class DemoActivity extends AppCompatActivity {
         mAdapter=new PagerAdapter(getSupportFragmentManager(),mFragments);
         vpPhotoPager.setAdapter(mAdapter);
     }
+
+
 
     private class PagerAdapter extends FragmentPagerAdapter
     {
