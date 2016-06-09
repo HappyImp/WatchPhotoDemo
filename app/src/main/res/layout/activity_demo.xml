@@ -8,8 +8,16 @@
     <com.example.administrator.watchphotodemo.view.ThrowViewpager
         android:id="@+id/vp_photo_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <include layout="@layout/include_title_watch"
+        android:layout_height="match_parent" />
+
+    <include
+        layout="@layout/include_title_watch"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <include
+        layout="@layout/include_bottom_watch"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_width="match_parent"/>
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>

@@ -1,13 +1,12 @@
 package com.example.administrator.watchphotodemo;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
 import com.example.administrator.watchphotodemo.constant.Constant;
 import com.example.administrator.watchphotodemo.view.BaseActivity;
+import com.f2prateek.dart.HensonNavigable;
 
 import java.util.ArrayList;
 
@@ -21,13 +20,14 @@ import butterknife.OnClick;
  * 2016/6/8
  */
 public class MainDemoActivity extends BaseActivity {
+    ArrayList<String> mdatas = new ArrayList<>();
     @Bind(R.id.btn_select)
     Button btnSelect;
     @Bind(R.id.btn_delete)
     Button btnDelete;
     @Bind(R.id.btn_save)
     Button btnSave;
-    ArrayList<String> mdatas = new ArrayList<>();
+
 
     @Override
     protected void initGetIntent() {
@@ -55,14 +55,19 @@ public class MainDemoActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String url;
         switch (resultCode) {
             case Constant.CALLBACK_CODE_SELETE:
                 Log.d("MainDemoActivity", "callback_selete");
                 break;
             case Constant.CALLBACK_CODE_DELECT:
+                url= (String) data.getExtras().get(Constant.CALLBACK_DATA_CODE);
+                Log.d("MainDemoActivity", url);
                 Log.d("MainDemoActivity", "callback_delect");
                 break;
             case Constant.CALLBACK_CODE_SAVE:
+                url= (String) data.getExtras().get(Constant.CALLBACK_DATA_CODE);
+                Log.d("MainDemoActivity", url);
                 Log.d("MainDemoActivity", "callback_save");
                 break;
         }
@@ -87,4 +92,5 @@ public class MainDemoActivity extends BaseActivity {
                 break;
         }
     }
+
 }

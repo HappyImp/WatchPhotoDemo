@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.example.administrator.watchphotodemo.BitmapUtils.PicassoIML;
 import com.example.administrator.watchphotodemo.R;
+import com.f2prateek.dart.HensonNavigable;
 
 import java.util.ArrayList;
 
@@ -33,6 +34,7 @@ public class PhotoFragment extends BaseFragment {
         args.putString("photo",photoData);
         fragment.setArguments(args);
         return fragment;
+
     }
 
     @Override
@@ -60,7 +62,7 @@ public class PhotoFragment extends BaseFragment {
     }
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         ButterKnife.unbind(this);
+        super.onDestroyView();
     }
 }

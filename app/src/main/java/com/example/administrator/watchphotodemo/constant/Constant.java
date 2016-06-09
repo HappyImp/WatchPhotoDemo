@@ -14,4 +14,5 @@ public  class Constant {
     public static final int CALLBACK_CODE_SAVE=25412644;
     public static final String CALLBACK_PHOTOLIST="CALLBACK_PHOTOLIST";
     public static final int REQUEST_CODE = 00001111;
+    public static final String CALLBACK_DATA_CODE="CALLBACK_DATA_CODE";
 }

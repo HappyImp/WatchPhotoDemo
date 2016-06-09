@@ -26,4 +26,8 @@ dependencies {
     compile 'com.github.chrisbanes:PhotoView:1.2.6'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.jakewharton:butterknife:7.0.0'
+    compile 'com.f2prateek.dart:dart:2.0.0'
+    provided 'com.f2prateek.dart:dart-processor:2.0.0'
+    compile 'com.f2prateek.dart:henson:2.0.0'
+    provided 'com.f2prateek.dart:henson-processor:2.0.0'
 }
