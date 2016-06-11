@@ -33,7 +33,6 @@ import butterknife.OnClick;
  * 2016/6/8
  */
 
-
 public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
     //获取列表码与请求码
@@ -67,7 +66,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private ArrayList<String> mTempData;
 
-
+    
     public static void watchPhoto(Activity activity, String url, String actionKey) {
         ArrayList<String> datas = new ArrayList<>();
         datas.add(url);
@@ -194,12 +193,14 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         if (mNumIsShow) {
             tvTitleNum.setText(getString(R.string.title_num, position + 1, mdatas.size()));
         }
-        if (mTempData.contains(mdatas.get(position))) {
-            btnTitleRight.setText("选中");
-            mIsSelected = true;
-        } else {
-            btnTitleRight.setText("未选中");
-            mIsSelected = false;
+        if (actionKey.equals(Constant.RESULT_CODE_SELETE)) {
+            if (mTempData.contains(mdatas.get(position))) {
+                btnTitleRight.setText("选中");
+                mIsSelected = true;
+            } else {
+                btnTitleRight.setText("未选中");
+                mIsSelected = false;
+            }
         }
         mPosition = position;
 

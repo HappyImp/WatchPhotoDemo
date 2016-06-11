@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import com.example.administrator.watchphotodemo.constant.Constant;
 import com.example.administrator.watchphotodemo.view.BaseActivity;
+import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.HensonNavigable;
 
 import java.util.ArrayList;
@@ -31,7 +32,6 @@ public class MainDemoActivity extends BaseActivity {
 
     @Override
     protected void initGetIntent() {
-
     }
 
     @Override
