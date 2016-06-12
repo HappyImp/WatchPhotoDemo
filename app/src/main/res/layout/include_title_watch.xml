@@ -9,9 +9,12 @@
         android:id="@+id/btn_title_back"
         android:layout_width="40dp"
         android:layout_height="match_parent"
+        android:layout_marginLeft="17dp"
+        android:drawableLeft="@mipmap/icon_back"
         android:gravity="center"
-        android:text="返回"
-        android:textColor="@color/white" />
+        android:text="@string/back"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_normal" />
 
     <TextView
         android:id="@+id/tv_title_num"
@@ -19,16 +22,18 @@
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:gravity="center"
-        tools:text="@string/title_num"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_normal"
+        tools:text="@string/title_num" />
 
-    <TextView
+
+    <ImageView
         android:id="@+id/btn_title_right"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_alignParentRight="true"
-        android:gravity="center"
-        android:text="xxx"
-        android:textColor="@color/white" />
+        android:layout_centerVertical="true"
+        android:layout_marginRight="13dp"
+        android:layout_marginTop="2dp" />
 
 </RelativeLayout>

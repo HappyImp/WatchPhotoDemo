@@ -10,10 +10,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.watchphotodemo.constant.Constant;
+import com.example.administrator.watchphotodemo.view.DelectSelectDialog;
+import com.example.administrator.watchphotodemo.view.DeletePop;
 import com.example.administrator.watchphotodemo.view.PhotoFragment;
 import com.example.administrator.watchphotodemo.view.ThrowViewpager;
 import com.f2prateek.dart.Dart;
@@ -33,7 +36,7 @@ import butterknife.OnClick;
  * 2016/6/8
  */
 
-public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, DelectSelectDialog.OnSelectLayout {
 
     //获取列表码与请求码
     static final String PHOTO_LIST = "PHOTO_LIST";
@@ -45,7 +48,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Bind(R.id.tv_title_num)
     TextView tvTitleNum;
     @Bind(R.id.btn_title_right)
-    TextView btnTitleRight;
+    ImageView btnTitleRight;
     @InjectExtra("actionkey")
     String actionKey;
     @InjectExtra(PHOTO_LIST)
@@ -63,10 +66,13 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
     private PagerAdapter mAdapter;
     private int mPosition = 0;
+    private DeletePop mDeletePop;
 
     private ArrayList<String> mTempData;
 
-    
+    private DelectSelectDialog mDialog;
+
+
     public static void watchPhoto(Activity activity, String url, String actionKey) {
         ArrayList<String> datas = new ArrayList<>();
         datas.add(url);
@@ -102,6 +108,10 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         initGetIntent();
         ButterKnife.bind(this);
         initView();
+        mDeletePop=new DeletePop(this,getWindow().getDecorView());
+        mDialog=DelectSelectDialog.newInstance("确定要删除图片吗?","删除","取消");
+        mDialog.setOnSelectLayout(this);
+
     }
 
     private void initGetIntent() {
@@ -116,19 +126,16 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         //通过attion判断选择界面
         switch (actionKey) {
             case Constant.RESULT_CODE_DELETE:
-                Log.d("DemoActivity", "delete");
-                btnTitleRight.setText("删除");
+                btnTitleRight.setBackgroundResource(R.mipmap.btn_delete);
                 break;
             case Constant.RESULT_CODE_SAVE:
                 mNumIsShow = true;
-                btnTitleRight.setText("保存");
-                Log.d("DemoActivity", "save");
+                btnTitleRight.setBackgroundResource(R.mipmap.btn_save);
                 break;
             case Constant.RESULT_CODE_SELETE:
                 mNumIsShow = true;
-                btnTitleRight.setText("选择");
+                btnTitleRight.setBackgroundResource(R.mipmap.btn_correct);
                 icBottomWatch.setVisibility(View.VISIBLE);
-                Log.d("DemoActivity", "select");
                 break;
         }
         //通过data.size来创建多个fragment
@@ -159,9 +166,8 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
             case R.id.btn_title_right:
                 switch (actionKey) {
                     case Constant.RESULT_CODE_DELETE:
-                        intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
-                        this.setResult(Constant.CALLBACK_CODE_DELECT, intent);
-                        this.finish();
+                        mDialog.show(getSupportFragmentManager(),"");
+//                        this.finish();
                         break;
                     case Constant.RESULT_CODE_SAVE:
                         intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
@@ -170,11 +176,13 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
                         break;
                     case Constant.RESULT_CODE_SELETE:
                         if (mIsSelected) {
+                            btnTitleRight.setBackgroundResource(R.mipmap.btn_correct);
                             mTempData.remove(mdatas.get(mPosition));
-                            btnTitleRight.setText("未选中");
+                            mIsSelected=!mIsSelected;
                         } else {
+                            btnTitleRight.setBackgroundResource(R.mipmap.btn_correct_normal);
                             mTempData.add(mdatas.get(mPosition));
-                            btnTitleRight.setText("选中");
+                            mIsSelected=!mIsSelected;
                         }
                         break;
                 }
@@ -195,10 +203,10 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
         if (actionKey.equals(Constant.RESULT_CODE_SELETE)) {
             if (mTempData.contains(mdatas.get(position))) {
-                btnTitleRight.setText("选中");
+                btnTitleRight.setBackgroundResource(R.mipmap.btn_correct_normal);
                 mIsSelected = true;
             } else {
-                btnTitleRight.setText("未选中");
+                btnTitleRight.setBackgroundResource(R.mipmap.btn_correct);
                 mIsSelected = false;
             }
         }
@@ -209,6 +217,24 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    public void onClickFirst(String str1, String tag) {
+
+    }
+
+    @Override
+    public void onClickSecond(String str2, String tag) {
+        Intent intent=new Intent();
+        intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
+        this.setResult(Constant.CALLBACK_CODE_DELECT, intent);
+        mDeletePop.showPopupWindow();
+    }
+
+    @Override
+    public void onClickThird(String tag) {
+        mDialog.dismiss();
     }
 
 

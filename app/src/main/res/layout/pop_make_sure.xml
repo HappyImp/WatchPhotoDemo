@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_select_sex_other"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dialog_select_text"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:background="@color/white"
+            android:text="确定要删除图片吗?"
+            android:textColor="@color/textColorBlack"
+            android:textSize="@dimen/text_normal" />
+
+        <TextView
+            android:id="@+id/dialog_select_sex_girl"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:background="@color/white"
+            android:text="@string/delete"
+            android:textColor="@color/text_red"
+            android:textSize="@dimen/text_normal" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="#00000000" />
+
+        <TextView
+            android:id="@+id/dialog_select_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="取消"
+            android:background="@color/white"
+            android:textColor="@color/textColorBlack"
+            android:textSize="@dimen/text_normal" />
+    </LinearLayout>
+</RelativeLayout>

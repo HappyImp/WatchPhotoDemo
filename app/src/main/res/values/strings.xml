@@ -2,4 +2,7 @@
     <string name="app_name">WatchPhotoDemo</string>
     <string name="title_num">%1$s/%2$s</string>
     <string name="complete">完成</string>
+    <string name="back">返回</string>
+    <string name="delete_comple">已删除</string>
+    <string name="delete">删除</string>
 </resources>
