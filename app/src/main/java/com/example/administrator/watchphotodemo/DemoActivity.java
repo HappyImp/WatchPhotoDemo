@@ -2,9 +2,9 @@ package com.example.administrator.watchphotodemo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.databinding.Bindable;
 import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
-import android.net.Uri;
+import android.databinding.ObservableField;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.administrator.watchphotodemo.constant.Constant;
+import com.example.administrator.watchphotodemo.databinding.ActivityDemoBinding;
 import com.example.administrator.watchphotodemo.view.DelectSelectDialog;
 import com.example.administrator.watchphotodemo.view.DeletePop;
 import com.example.administrator.watchphotodemo.view.PhotoFragment;
@@ -25,9 +26,6 @@ import com.example.administrator.watchphotodemo.view.ThrowViewpager;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 
@@ -72,8 +70,6 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     TextView btnSelectComplete;
     @Bind(R.id.ic_bottom_watch)
     RelativeLayout icBottomWatch;
-    @Bind(R.id.tv_select_num)
-    TextView tvSelectNum;
 
     private boolean mNumIsShow = false;
     private boolean mIsSelected = false;
@@ -81,18 +77,17 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     private PagerAdapter mAdapter;
 
     private int mPosition = 0;
-    private int mSelectNum = 0;
+
+
+    private String mSelectNum = "0";
 
     private DeletePop mDeletePop;
 
     private ArrayList<String> mTempData;
-
     private DelectSelectDialog mDialog;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+
+    ActivityDemoBinding bindding;
+
 
 
     public static void watchPhoto(Activity activity, String url, String actionKey) {
@@ -121,14 +116,12 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         intent.putExtra(Constant.PhotoBroAction.ACTION_KEY, actionKey);
         activity.startActivityForResult(intent, Constant.REQUEST_CODE);
     }
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_demo);
-        DemoActivityBindding bingding = DataBindingUtil.setContentView(this, R.layout.include_bottom_watch);
-
+//        setContentView(R.layout.activity_demo);
+        bindding= DataBindingUtil.setContentView(this, R.layout.activity_demo);
         initGetIntent();
         ButterKnife.bind(this);
         bindData();
@@ -136,9 +129,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         mDeletePop = new DeletePop(this, getWindow().getDecorView());
         mDialog = DelectSelectDialog.newInstance(getString(R.string.make_sure_delete), getString(R.string.delete), getString(R.string.cancel));
         mDialog.setOnSelectLayout(this);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        bindding.setSelectnum(mSelectNum);
     }
 
 
@@ -208,18 +199,19 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
                         break;
                     case Constant.RESULT_CODE_SELETE:
                         if (mIsSelected) {
-                            mSelectNum--;
                             btnTitleRight.setBackgroundResource(R.mipmap.btn_correct);
                             mTempData.remove(mdatas.get(mPosition));
                             mIsSelected = !mIsSelected;
                         } else {
-                            mSelectNum++;
                             btnTitleRight.setBackgroundResource(R.mipmap.btn_correct_normal);
                             mTempData.add(mdatas.get(mPosition));
                             mIsSelected = !mIsSelected;
                         }
+                        Log.d("DemoActivity", "mSelectNum:" + mSelectNum);
+                        mSelectNum=mTempData.size()+"";
                         break;
                 }
+                bindding.setSelectnum(mSelectNum);
                 break;
 
         }
@@ -269,46 +261,6 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public void onClickThird(String tag) {
         mDialog.dismiss();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Demo Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.example.administrator.watchphotodemo/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Demo Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://com.example.administrator.watchphotodemo/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
     }
 
 
