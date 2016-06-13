@@ -2,6 +2,9 @@ package com.example.administrator.watchphotodemo;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +25,9 @@ import com.example.administrator.watchphotodemo.view.ThrowViewpager;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 
@@ -31,6 +37,12 @@ import butterknife.OnClick;
 
 /**
  * 两个静态方法，通过传activity,url或者url容器,以及一个action码
+ * 在activity的回调中使用
+ * {
+ * Constant.CALLBACK_CODE_SELETE
+ * Constant.CALLBACK_CODE_DELECT
+ * Constant.CALLBACK_CODE_SAVE    获得回调的url容器
+ * }
  * Created by Zoi.
  * E-mail：KyluZoi@gmail.com
  * 2016/6/8
@@ -49,7 +61,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     TextView tvTitleNum;
     @Bind(R.id.btn_title_right)
     ImageView btnTitleRight;
-    @InjectExtra("actionkey")
+    @InjectExtra(Constant.PhotoBroAction.ACTION_KEY)
     String actionKey;
     @InjectExtra(PHOTO_LIST)
     ArrayList<String> mdatas;
@@ -60,17 +72,27 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     TextView btnSelectComplete;
     @Bind(R.id.ic_bottom_watch)
     RelativeLayout icBottomWatch;
+    @Bind(R.id.tv_select_num)
+    TextView tvSelectNum;
 
     private boolean mNumIsShow = false;
     private boolean mIsSelected = false;
     private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
     private PagerAdapter mAdapter;
+
     private int mPosition = 0;
+    private int mSelectNum = 0;
+
     private DeletePop mDeletePop;
 
     private ArrayList<String> mTempData;
 
     private DelectSelectDialog mDialog;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     public static void watchPhoto(Activity activity, String url, String actionKey) {
@@ -88,7 +110,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     public static void watchPhoto(Activity activity, ArrayList<String> photoList, String actionKey, String filePath) {
         Intent intent = new Intent(activity, DemoActivity.class);
         intent.putExtra(PHOTO_LIST, photoList);
-        intent.putExtra("actionkey", actionKey);
+        intent.putExtra(Constant.PhotoBroAction.ACTION_KEY, actionKey);
         intent.putExtra("fileurl", filePath);
         activity.startActivityForResult(intent, Constant.REQUEST_CODE);
     }
@@ -96,7 +118,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     public static void watchPhoto(Activity activity, ArrayList<String> photoList, String actionKey) {
         Intent intent = new Intent(activity, DemoActivity.class);
         intent.putExtra(PHOTO_LIST, photoList);
-        intent.putExtra("actionkey", actionKey);
+        intent.putExtra(Constant.PhotoBroAction.ACTION_KEY, actionKey);
         activity.startActivityForResult(intent, Constant.REQUEST_CODE);
     }
 
@@ -105,19 +127,29 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
+        DemoActivityBindding bingding = DataBindingUtil.setContentView(this, R.layout.include_bottom_watch);
+
         initGetIntent();
         ButterKnife.bind(this);
+        bindData();
         initView();
-        mDeletePop=new DeletePop(this,getWindow().getDecorView());
-        mDialog=DelectSelectDialog.newInstance("确定要删除图片吗?","删除","取消");
+        mDeletePop = new DeletePop(this, getWindow().getDecorView());
+        mDialog = DelectSelectDialog.newInstance(getString(R.string.make_sure_delete), getString(R.string.delete), getString(R.string.cancel));
         mDialog.setOnSelectLayout(this);
-
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
 
     private void initGetIntent() {
 //        action = (String) getIntent().getExtras().get("actionkey");
 //        mdatas=getIntent().getStringArrayListExtra(PHOTO_LIST);
         Dart.inject(this);
+    }
+
+    private void bindData() {
+
     }
 
 
@@ -166,7 +198,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
             case R.id.btn_title_right:
                 switch (actionKey) {
                     case Constant.RESULT_CODE_DELETE:
-                        mDialog.show(getSupportFragmentManager(),"");
+                        mDialog.show(getSupportFragmentManager(), "");
 //                        this.finish();
                         break;
                     case Constant.RESULT_CODE_SAVE:
@@ -176,13 +208,15 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
                         break;
                     case Constant.RESULT_CODE_SELETE:
                         if (mIsSelected) {
+                            mSelectNum--;
                             btnTitleRight.setBackgroundResource(R.mipmap.btn_correct);
                             mTempData.remove(mdatas.get(mPosition));
-                            mIsSelected=!mIsSelected;
+                            mIsSelected = !mIsSelected;
                         } else {
+                            mSelectNum++;
                             btnTitleRight.setBackgroundResource(R.mipmap.btn_correct_normal);
                             mTempData.add(mdatas.get(mPosition));
-                            mIsSelected=!mIsSelected;
+                            mIsSelected = !mIsSelected;
                         }
                         break;
                 }
@@ -226,7 +260,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onClickSecond(String str2, String tag) {
-        Intent intent=new Intent();
+        Intent intent = new Intent();
         intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
         this.setResult(Constant.CALLBACK_CODE_DELECT, intent);
         mDeletePop.showPopupWindow();
@@ -235,6 +269,46 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public void onClickThird(String tag) {
         mDialog.dismiss();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Demo Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.administrator.watchphotodemo/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Demo Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.administrator.watchphotodemo/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 
 
@@ -266,11 +340,11 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-
     @Override
     protected void onDestroy() {
         // TODO: 2016/6/8 如果发生oom 在此添加清除缓存方法。 
         super.onDestroy();
     }
+
 }
 
