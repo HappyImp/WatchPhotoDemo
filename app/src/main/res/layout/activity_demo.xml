@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.administrator.watchphotodemo.DemoActivity">
+        tools:context=".view.PhotoBrowserActivity">
 
         <com.example.administrator.watchphotodemo.view.ThrowViewpager
             android:id="@+id/vp_photo_pager"
@@ -36,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentBottom="true"
+            android:visibility="gone"
             android:background="#55000000">
 
 

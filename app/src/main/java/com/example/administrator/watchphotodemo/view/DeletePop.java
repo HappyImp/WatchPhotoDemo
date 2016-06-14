@@ -32,7 +32,6 @@ public class DeletePop extends PopupWindow {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 dismiss();
-                context.finish();
                 return false;
             }
         });

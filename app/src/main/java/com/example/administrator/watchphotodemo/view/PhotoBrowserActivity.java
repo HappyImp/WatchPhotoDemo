@@ -1,14 +1,14 @@
-package com.example.administrator.watchphotodemo;
+package com.example.administrator.watchphotodemo.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.databinding.Bindable;
 import android.databinding.DataBindingUtil;
-import android.databinding.ObservableField;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,12 +17,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.administrator.watchphotodemo.R;
 import com.example.administrator.watchphotodemo.constant.Constant;
 import com.example.administrator.watchphotodemo.databinding.ActivityDemoBinding;
-import com.example.administrator.watchphotodemo.view.DelectSelectDialog;
-import com.example.administrator.watchphotodemo.view.DeletePop;
-import com.example.administrator.watchphotodemo.view.PhotoFragment;
-import com.example.administrator.watchphotodemo.view.ThrowViewpager;
 import com.f2prateek.dart.Dart;
 import com.f2prateek.dart.InjectExtra;
 import com.f2prateek.dart.Nullable;
@@ -46,7 +43,8 @@ import butterknife.OnClick;
  * 2016/6/8
  */
 
-public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, DelectSelectDialog.OnSelectLayout {
+public class PhotoBrowserActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, DelectSelectDialog.OnSelectLayout
+,PhotoFragment.SaveImpl{
 
     //获取列表码与请求码
     static final String PHOTO_LIST = "PHOTO_LIST";
@@ -89,21 +87,20 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     ActivityDemoBinding bindding;
 
 
-
     public static void watchPhoto(Activity activity, String url, String actionKey) {
         ArrayList<String> datas = new ArrayList<>();
         datas.add(url);
-        DemoActivity.watchPhoto(activity, datas, actionKey);
+        PhotoBrowserActivity.watchPhoto(activity, datas, actionKey);
     }
 
     public static void watchPhoto(Activity activity, String url, String actionKey, String filePath) {
         ArrayList<String> datas = new ArrayList<>();
         datas.add(url);
-        DemoActivity.watchPhoto(activity, datas, actionKey, filePath);
+        PhotoBrowserActivity.watchPhoto(activity, datas, actionKey, filePath);
     }
 
     public static void watchPhoto(Activity activity, ArrayList<String> photoList, String actionKey, String filePath) {
-        Intent intent = new Intent(activity, DemoActivity.class);
+        Intent intent = new Intent(activity, PhotoBrowserActivity.class);
         intent.putExtra(PHOTO_LIST, photoList);
         intent.putExtra(Constant.PhotoBroAction.ACTION_KEY, actionKey);
         intent.putExtra("fileurl", filePath);
@@ -111,17 +108,17 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     public static void watchPhoto(Activity activity, ArrayList<String> photoList, String actionKey) {
-        Intent intent = new Intent(activity, DemoActivity.class);
+        Intent intent = new Intent(activity, PhotoBrowserActivity.class);
         intent.putExtra(PHOTO_LIST, photoList);
         intent.putExtra(Constant.PhotoBroAction.ACTION_KEY, actionKey);
         activity.startActivityForResult(intent, Constant.REQUEST_CODE);
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_demo);
-        bindding= DataBindingUtil.setContentView(this, R.layout.activity_demo);
+        bindding = DataBindingUtil.setContentView(this, R.layout.activity_demo);
         initGetIntent();
         ButterKnife.bind(this);
         bindData();
@@ -137,6 +134,10 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
 //        action = (String) getIntent().getExtras().get("actionkey");
 //        mdatas=getIntent().getStringArrayListExtra(PHOTO_LIST);
         Dart.inject(this);
+        if(mSaveUrl==null||mSaveUrl.equals("")||mSaveUrl=="")
+        {
+            mSaveUrl=Constant.DEFAULT_FILE_PATH;
+        }
     }
 
     private void bindData() {
@@ -163,7 +164,9 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
         //通过data.size来创建多个fragment
         for (int i = 0; i < mdatas.size(); i++) {
-            mFragments.add(PhotoFragment.newInstance(mdatas.get(i)));
+            PhotoFragment fragment=PhotoFragment.newInstance(mdatas.get(i),mSaveUrl);
+            fragment.setImp(this);
+            mFragments.add(fragment);
         }
         mAdapter = new PagerAdapter(getSupportFragmentManager(), mFragments);
         vpPhotoPager.setAdapter(mAdapter);
@@ -177,6 +180,13 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         Intent intent = new Intent();
         switch (view.getId()) {
             case R.id.btn_title_back:
+                switch (actionKey)
+                {
+                    case Constant.RESULT_CODE_SAVE:
+                        Intent ii=new Intent();
+                        ii.putStringArrayListExtra(Constant.CALLBACK_DATA_CODE,mTempData);
+                        this.setResult(Constant.CALLBACK_CODE_SAVE, ii);
+                }
                 this.finish();
                 break;
             case R.id.btn_select_complete:
@@ -193,9 +203,11 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
 //                        this.finish();
                         break;
                     case Constant.RESULT_CODE_SAVE:
-                        intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
-                        this.setResult(Constant.CALLBACK_CODE_SAVE, intent);
-                        this.finish();
+//                        intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
+//                        this.setResult(Constant.CALLBACK_CODE_SAVE, intent);
+                        PhotoFragment photoFragment = (PhotoFragment) mFragments.get(mPosition);
+                        photoFragment.saveBitmap();
+//                        this.finish();
                         break;
                     case Constant.RESULT_CODE_SELETE:
                         if (mIsSelected) {
@@ -208,7 +220,7 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
                             mIsSelected = !mIsSelected;
                         }
                         Log.d("DemoActivity", "mSelectNum:" + mSelectNum);
-                        mSelectNum=mTempData.size()+"";
+                        mSelectNum = mTempData.size() + "";
                         break;
                 }
                 bindding.setSelectnum(mSelectNum);
@@ -237,7 +249,6 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
             }
         }
         mPosition = position;
-
     }
 
     @Override
@@ -252,9 +263,12 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onClickSecond(String str2, String tag) {
+
+        mTempData.add(mdatas.get(mPosition));
         Intent intent = new Intent();
-        intent.putExtra(Constant.CALLBACK_DATA_CODE, mdatas.get(mPosition));
+        intent.putExtra(Constant.CALLBACK_DATA_CODE, mTempData);
         this.setResult(Constant.CALLBACK_CODE_DELECT, intent);
+        mAdapter.remove(mPosition);
         mDeletePop.showPopupWindow();
     }
 
@@ -263,12 +277,18 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         mDialog.dismiss();
     }
 
+    @Override
+    public void saveFileSuccess(String filePath) {
+        mTempData.add(filePath);
+    }
+
 
     /**
      * viewPager适配器 内部类
      */
-    private class PagerAdapter extends FragmentPagerAdapter {
+    private class PagerAdapter extends FragmentStatePagerAdapter {
         private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
+        private FragmentManager fragmentManager;
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -278,6 +298,8 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
                             ArrayList<Fragment> fragments) {
             super(fragmentManager);
             this.fragments = fragments;
+            this.fragmentManager = fragmentManager;
+            notifyDataSetChanged();
         }
 
 
@@ -290,11 +312,33 @@ public class DemoActivity extends AppCompatActivity implements ViewPager.OnPageC
         public int getCount() {
             return fragments.size();
         }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            if (getCount() > 0) {
+                return POSITION_NONE;
+            }
+            PhotoBrowserActivity.this.finish();
+            return super.getItemPosition(object);
+        }
+
+
+        public void remove(int pos) {
+            fragments.remove(pos);
+            notifyDataSetChanged();
+        }
     }
+
 
     @Override
     protected void onDestroy() {
-        // TODO: 2016/6/8 如果发生oom 在此添加清除缓存方法。 
+        // TODO: 2016/6/8 如果发生oom 在此添加清除缓存方法。
+        mDeletePop.dismiss();
         super.onDestroy();
     }
 

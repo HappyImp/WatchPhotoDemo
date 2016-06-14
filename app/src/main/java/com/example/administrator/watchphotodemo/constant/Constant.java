@@ -1,5 +1,7 @@
 package com.example.administrator.watchphotodemo.constant;
 
+import android.os.Environment;
+
 /**
  * Created by Zoi.
  * E-mail：KyluZoi@gmail.com
@@ -15,7 +17,7 @@ public  class Constant {
     public static final String CALLBACK_PHOTOLIST="CALLBACK_PHOTOLIST";
     public static final int REQUEST_CODE = 00001111;
     public static final String CALLBACK_DATA_CODE="CALLBACK_DATA_CODE";
-
+    public static final String DEFAULT_FILE_PATH= Environment.getExternalStorageDirectory().getAbsolutePath()+"/zzz";//调用save方法后默认的存放路径
 
     public class PhotoBroAction{
         public static final String ACTION_KEY="ACTION_KEY";

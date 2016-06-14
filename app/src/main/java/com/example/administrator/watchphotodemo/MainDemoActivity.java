@@ -6,8 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import com.example.administrator.watchphotodemo.constant.Constant;
 import com.example.administrator.watchphotodemo.view.BaseActivity;
-import com.f2prateek.dart.Dart;
-import com.f2prateek.dart.HensonNavigable;
+import com.example.administrator.watchphotodemo.view.PhotoBrowserActivity;
 
 import java.util.ArrayList;
 
@@ -56,18 +55,25 @@ public class MainDemoActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String url;
+        ArrayList<String> urls=new ArrayList<>();
         switch (resultCode) {
             case Constant.CALLBACK_CODE_SELETE:
                 Log.d("MainDemoActivity", "callback_selete");
                 break;
             case Constant.CALLBACK_CODE_DELECT:
-                url= (String) data.getExtras().get(Constant.CALLBACK_DATA_CODE);
-                Log.d("MainDemoActivity", url);
+                urls=  data.getExtras().getStringArrayList(Constant.CALLBACK_DATA_CODE);
+                for (int i=0;i<urls.size();i++)
+                {
+                    Log.d("MainDemoActivity", urls.get(i));
+                }
                 Log.d("MainDemoActivity", "callback_delect");
                 break;
             case Constant.CALLBACK_CODE_SAVE:
-                url= (String) data.getExtras().get(Constant.CALLBACK_DATA_CODE);
-                Log.d("MainDemoActivity", url);
+                urls=data.getExtras().getStringArrayList(Constant.CALLBACK_DATA_CODE);
+                for (int i=0;i<urls.size();i++)
+                {
+                    Log.d("MainDemoActivity", urls.get(i));
+                }
                 Log.d("MainDemoActivity", "callback_save");
                 break;
         }
@@ -82,13 +88,13 @@ public class MainDemoActivity extends BaseActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_select:
-                DemoActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_SELETE);
+                PhotoBrowserActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_SELETE);
                 break;
             case R.id.btn_delete:
-                DemoActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_DELETE);
+                PhotoBrowserActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_DELETE);
                 break;
             case R.id.btn_save:
-                DemoActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_SAVE);
+                PhotoBrowserActivity.watchPhoto(this, mdatas, Constant.RESULT_CODE_SAVE);
                 break;
         }
     }
